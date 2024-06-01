@@ -5,6 +5,7 @@ const Product = require("./models/product.model");
 const mongoose = require("mongoose"); // importing mongoose
 
 app.use(express.json()); // express middleware
+app.use(express.urlencoded({extended: false})); // so that form data ko bhi hum send kar saktein hai
 
 // adding Product to products collection
 app.post("/api/products", async (req, res) => {
@@ -39,6 +40,44 @@ app.get('/api/products/:id', async (req,res)=>{
         res.status(500).json({message: err.message});
     }
 })
+
+
+//  update peoduct by id
+app.put('api/product/:id', async (req,res)=>{
+    try{
+        const { id } = req.params;
+        const product = await Product.findByIdAndUpdate(id, req.body);
+        if(!product){
+            return res.status(400).json({message: "Product not found"});
+        }
+        // checking if product is updated or not
+        const updatedProduct = await Product.findById(id);
+        res.status(200).json(updatedProduct);
+    }
+    catch(err){
+        res.status(500).json({message: err.message});
+    }
+});
+
+//  delete any product by id
+app.delete('/api/product/:id', async(req, res)=>{
+    try{
+        const { id } = req.params;
+
+        const product = await Product.findByIdAndDelete(id);
+        res.status(200).json({message: "Deleted successfully"});
+        if(!product){
+            return res.status(400).json({message:" The element you are trying to delete doesnt exist."});
+        }
+
+        const deletedProduct = await Product.findById(id);
+        res.status(200).json(deletedProduct);
+    }
+    catch(err){
+        res.status(500).json({message: err.message});
+    }
+});
+
 
 // connection of mongodb atlas
 mongoose
