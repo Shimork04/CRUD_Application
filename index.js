@@ -28,7 +28,17 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-
+// getting id using req.params
+app.get('/api/products/:id', async (req,res)=>{
+    try{
+        const { id } = req.params;
+        const product = await Product.findById(id);
+        res.status(200).json(product);
+    }
+    catch(err){
+        res.status(500).json({message: err.message});
+    }
+})
 
 // connection of mongodb atlas
 mongoose
